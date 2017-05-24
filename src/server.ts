@@ -45,8 +45,8 @@ io.on('connection', function (socket) {
         handleMessageRequest(msg);
     });
 
-    socket.on('disconnect', function() {
-        handleUserDisconnect();
+    socket.on('disconnect', function(username: string) {
+        handleUserDisconnect(username);
     });
 });
 
@@ -61,7 +61,7 @@ function handleUserLogin(username: string){
     io.emit('chat message', loginMessage);
 
     messageHistory.push(loginMessage);
-    messageHistory.forEach(msg => console.log(msg));
+    // messageHistory.forEach(msg => console.log(msg));
 }
 
 
@@ -71,10 +71,14 @@ function handleMessageRequest(message: string) {
     io.emit('chat message', message); // TODO: Will probably pass props to a REACT view or maybe just re-render entire page? (Seems inefficient)
 
     messageHistory.push(message);
-    messageHistory.forEach(msg => console.log(msg));
+    // messageHistory.forEach(msg => console.log(msg));
 }
 
 
-function handleUserDisconnect() {
-    console.log('user disconnected');
+function handleUserDisconnect(username: string) {
+    console.log(username + ' has disconnected');
+    let disconnectMessage: string = 'User has disconnected.';
+
+    messageHistory.push(disconnectMessage);
+
 }
