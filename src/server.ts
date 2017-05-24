@@ -20,12 +20,22 @@ app.get('/', function (req, res) {
 });
 
 
+
 // Listening with socket.io
 io.on('connection', function (socket) {
-    console.log('a user connected');
-    socket.emit('server event', { foo: 'bar'});
-    socket.on('client event', function (data: string) {
-        socket.broadcast.emit('update label', data);
+    console.log('user connected');
+    
+    // socket.on('client event', function (data: string) {
+    //     socket.broadcast.emit('update label', data);
+    // });
+
+    socket.on('chat message', function (msg: string) {
+        console.log('Message: ' + msg);
+        io.emit('chat message', msg);
+    });
+
+    socket.on('disconnect', function() {
+        console.log('user disconnected');
     });
 });
 
