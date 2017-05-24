@@ -1,4 +1,5 @@
 import * as express from 'express';
+import * as sio from 'socket.io';
 
 const serverPort: number = process.env.PORT || 3000;
 
