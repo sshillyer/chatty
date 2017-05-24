@@ -25,10 +25,6 @@ app.get('/', function (req, res) {
 io.on('connection', function (socket) {
     console.log('user connected');
     
-    // socket.on('client event', function (data: string) {
-    //     socket.broadcast.emit('update label', data);
-    // });
-
     socket.on('chat message', function (msg: string) {
         console.log('Message: ' + msg);
         io.emit('chat message', msg);
