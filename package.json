@@ -1,16 +1,19 @@
 {
   "name": "chat",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "React, Node, Express and Typescript chat server and client",
+  "main": "server.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "source-map-loader": "^0.2.1",
     "ts-loader": "^2.1.0",
-    "typescript": "^2.3.3"
+    "typescript": "^2.3.3",
+    "webpack": "^2.6.0"
   },
   "dependencies": {
     "express": "^4.15.3",

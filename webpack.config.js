@@ -5,21 +5,15 @@ module.exports = {
     path: __dirname
   },
   module: {
-   rules: [
-     {
-       enforce: 'pre',
-       test: /\.js$/,
-       loader: "source-map-loader"
-     },
-     {
-       enforce: 'pre',
-       test: /\.tsx?$/,
-       use: "source-map-loader"
-     }
-   ]
- },
- resolve: {
-   extensions: [".tsx", ".ts", ".js"]
- },
- devtool: 'inline-source-map',
+    rules: [
+      {
+        test: /\.tsx?$/,
+        loader: 'ts-loader',
+        exclude: /node_modules/,
+      }
+    ]
+  },
+  resolve: {
+    extensions: [".tsx", ".ts", ".js"]
+  }
 };
