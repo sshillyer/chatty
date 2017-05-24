@@ -20,7 +20,7 @@
         $(function () {
           var socket = io('http://localhost:8080');
 
-          $('form').submit(function(){
+          $('form[name="message-form"]').submit(function(){
             socket.emit('chat message', $('#m').val());
             $('#m').val('');
             return false;
@@ -30,7 +30,7 @@
             $('#messages').append($('<li>').text(msg));
           });
 
-          $('form').submit(function(){
+          $('form[name="login-form"]').submit(function(){
             socket.emit('user login', $('#user').val());
             $('#user').val('');
             return false;
@@ -39,13 +39,13 @@
     </script>
 
   <body>
-    <form action="" id="login-form">
+    <form action="" name="login-form">
       <input id="user" autocomplete="off" /><button>Login</button>
     </form>
 
     <ul id="messages"></ul>
 
-    <!--<form action="" id="message-form">
+    <!--<form action="" name="message-form">
       <input id="m" autocomplete="off" /><button>Send</button>
     </form>-->
 

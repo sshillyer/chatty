@@ -22,6 +22,8 @@ app.get('/', function (req, res) {
 });
 
 
+//  Setup simple array of strings to store the arrays in. TODO: Could make a UserMessage class that encapsulates username and message (+ timestamps etc.)
+let messageHistory: string[] = [];
 
 
 // Listening with socket.io to all connections and handling the logic
@@ -36,18 +38,43 @@ io.on('connection', function (socket) {
     console.log('user connected');
     
     socket.on('user login', function (username: string) {
-        console.log('Login request: ' + username);
+        handleUserLogin(username);
     });
 
     socket.on('chat message', function (msg: string) {
-        console.log('Message: ' + msg);
-        io.emit('chat message', msg);
+        handleMessageRequest(msg);
     });
 
     socket.on('disconnect', function() {
-        console.log('user disconnected');
+        handleUserDisconnect();
     });
 });
 
 server.listen(8080);
 
+// Handlers
+
+function handleUserLogin(username: string){
+    console.log('Login request: ' + username);
+    let loginMessage: string = 'User "' + username + '" has joined.';
+    
+    io.emit('chat message', loginMessage);
+
+    messageHistory.push(loginMessage);
+    messageHistory.forEach(msg => console.log(msg));
+}
+
+
+function handleMessageRequest(message: string) {
+    console.log('Message: ' + message);
+
+    io.emit('chat message', message); // TODO: Will probably pass props to a REACT view or maybe just re-render entire page? (Seems inefficient)
+
+    messageHistory.push(message);
+    messageHistory.forEach(msg => console.log(msg));
+}
+
+
+function handleUserDisconnect() {
+    console.log('user disconnected');
+}
