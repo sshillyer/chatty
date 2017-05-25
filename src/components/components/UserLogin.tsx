@@ -10,12 +10,16 @@ class UserLogin extends React.Component<UserLoginProps, {}> {
         <div>
             <h2>Web Chat Login</h2>
 
-
             <form action="" name="login-form" id="loginForm">
-                <input id="user" /><button>Login</button>
+                <input id="user" /><button onClick={this.yell}>Login</button>
             </form>
+            
         </div>
         );
+    }
+    
+    yell() {
+        alert("AHHH");
     }
 }
 

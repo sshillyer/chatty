@@ -23,9 +23,6 @@ app.listen(serverPort, () => {
 
 // Routes
 app.get('/', (req, res) => {
-    // For now we just send a static page with embedded js that allows user to go back and forth
-    // TODO: Make this render a REACT component composed of the login screen and boilerplate template
-    
     // res.sendFile(__dirname + '/index.html'); // This line will render index.html in the build folder which was just a placeholder to test the sockets.io functionality / prototype of the interface.
 
     // BEGINNING OF CONCEPTS FROM https://medium.com/@liheyse/react-server-side-rendering-ssr-with-express-and-css-modules-722ef0cc8fa0
@@ -33,7 +30,7 @@ app.get('/', (req, res) => {
 
     res.send(template({
         body: appString,
-        title: 'SSH! Chat'
+        title: 'SSH Chat'
     }));
     // END TUTORIAL STUFF
 });
@@ -44,13 +41,6 @@ let messageHistory: string[] = [];
 
 
 // Listening with socket.io to all connections and handling the logic
-/* TODO:
- * 1. 'username message' handling. Add user to list of users?
- * 2. When user logs in, add "user 'x' has logged in" to chat history in local storage
- * 3. When chat message is received,  add it to the message history in local storage
- * 4. In either event, how do we notify the other clients about what's happened?
- *
- */
 io.on('connection', function (socket) {
     console.log('user connected');
     
@@ -81,19 +71,17 @@ function handleUserLogin(username: string){
     // messageHistory.forEach(msg => console.log(msg));
 }
 
-
 function handleMessageRequest(message: string) {
     console.log('Message: ' + message);
 
-    io.emit('chat message', message); // TODO: Will probably pass props to a REACT view or maybe just re-render entire page? (Seems inefficient)
+    io.emit('chat message', message);
 
     messageHistory.push(message);
     // messageHistory.forEach(msg => console.log(msg));
 }
 
-
 function handleUserDisconnect(username: string) {
-    console.log(username + ' has disconnected');
+    console.log('User has disconnected');
     let disconnectMessage: string = 'User has disconnected.';
 
     messageHistory.push(disconnectMessage);

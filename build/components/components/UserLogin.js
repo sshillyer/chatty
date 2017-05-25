@@ -7,7 +7,10 @@ class UserLogin extends React.Component {
             React.createElement("h2", null, "Web Chat Login"),
             React.createElement("form", { action: "", name: "login-form", id: "loginForm" },
                 React.createElement("input", { id: "user" }),
-                React.createElement("button", null, "Login"))));
+                React.createElement("button", { onClick: this.yell }, "Login"))));
+    }
+    yell() {
+        alert("AHHH");
     }
 }
 exports.default = UserLogin;
