@@ -1,0 +1,16 @@
+React Router:
+
+ npm install --save react-router-dom
+
+use <BrowserRouter>
+
+
+// router component:
+import { BrowserRouter } from 'react-router-dom';
+
+ReactDOM.render({
+    <BrowserRouter>
+    <App />
+    </BrowserRouter>
+}, document.getElementById('root'));
+

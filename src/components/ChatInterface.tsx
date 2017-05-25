@@ -4,7 +4,7 @@ import MessageEntry from "./MessageEntry";
 
 interface ChatInterfaceProps {
     username: string;
-    // chathistory: string[];
+    messages: string[];
 }
 
 
@@ -12,15 +12,10 @@ class ChatInterface extends React.Component<ChatInterfaceProps, {}> {
     render() {
         return (
             <div>
-                <ChatHistory />
-                <MessageEntry username={this.props.username} message=""/>
+                <ChatHistory messages={this.props.messages}/>
+                <MessageEntry username={this.props.username}/>
             </div>
         );
-    }
-
-    handleSend() {
-        // Not sure how to get the onclick handler working with TypeScript; tutorial makes it look easy.
-        alert("Clicked!");
     }
 }
 

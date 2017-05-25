@@ -23,24 +23,43 @@ export default ({ body, title }: any) => {
       <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.1/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
       <script>
+
         $(function () {
           var socket = io('http://localhost:8080');
 
+
           $('form[name="message-form"]').submit(function(){
-            socket.emit('chat message', $('#m').val());
+            var message = $('#m').val();
+            console.log(message);
+            var username = $('#uname').val();
+            console.log(username);
+
+            socket.emit('chat message', '{"username":"' + username + '","message":"' + message +'"}' );
             $('#m').val('');
             return false;
           });
+
 
           socket.on('chat message', function(msg){
             $('#messages').append($('<li>').text(msg));
           });
 
+
           $('form[name="login-form"]').submit(function(){
             socket.emit('user login', $('#user').val());
+            window.location.href = "/" + $('#user').val();
             $('#user').val('');
             return false;
           });
+
+          window.addEventListener("beforeunload", function () {
+            var username = $('#uname').val();
+            if (username != null && /\S/.test(username)) {
+              socket.emit('user disconnected', username);
+            }
+            
+          });
+
         });
     </script>
 

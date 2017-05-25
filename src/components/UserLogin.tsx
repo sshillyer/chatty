@@ -1,7 +1,7 @@
 import * as React from "react";
 
 interface UserLoginProps {
-    username: string;
+    // no props
 }
 
 class UserLogin extends React.Component<UserLoginProps, {}> {
