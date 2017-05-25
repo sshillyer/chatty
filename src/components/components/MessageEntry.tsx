@@ -13,6 +13,10 @@ class MessageEntry extends React.Component<MessageEntryProps, {}> {
                 <label htmlFor="messageInput">Message</label>
                 <input type="text" name="message" value="" id="messageInput"/>
                 <button onClick={() => alert('click')}>Send</button>
+
+            <form action="" name="message-form" id="messageForm">
+                <input id="m" /><button>Send</button>
+            </form>
         </div>
         );
     }

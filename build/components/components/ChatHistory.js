@@ -2,12 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = require("react");
 // TODO: Eliminate this Test code
-const messages = ["First message", "second message", "Another message"];
-const chatItems = messages.map((msg) => React.createElement("li", { key: msg }, msg));
+// const messages = ["First message", "second message", "Another message"];
+// const chatItems = messages.map((msg) =>
+//     <li key={msg}>{msg}</li>
+// );
 class ChatHistory extends React.Component {
     render() {
-        return (React.createElement("div", { className: "chatHistory" },
-            React.createElement("ul", null, chatItems)));
+        return (React.createElement("div", null,
+            React.createElement("ul", { id: "messages" })));
     }
 }
 exports.default = ChatHistory;

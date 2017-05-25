@@ -9,9 +9,10 @@ class UserLogin extends React.Component<UserLoginProps, {}> {
         return (
         <div>
             <h2>Web Chat Login</h2>
-            <form>
-                <input type="text" name="username" defaultValue={this.props.username} />
-                <input type="submit" value="Log On"/>
+
+
+            <form action="" name="login-form" id="loginForm">
+                <input id="user" /><button>Login</button>
             </form>
         </div>
         );
@@ -19,3 +20,10 @@ class UserLogin extends React.Component<UserLoginProps, {}> {
 }
 
 export default UserLogin;
+
+
+            /*<form>
+                <input type="text" name="username" defaultValue={this.props.username} />
+                <input type="submit" value="Log On"/>
+            </form>*/
+            

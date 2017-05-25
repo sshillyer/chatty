@@ -5,16 +5,16 @@ interface ChatHistoryProps {
 }
 
 // TODO: Eliminate this Test code
-const messages = ["First message", "second message", "Another message"];
-const chatItems = messages.map((msg) =>
-    <li key={msg}>{msg}</li>
-);
+// const messages = ["First message", "second message", "Another message"];
+// const chatItems = messages.map((msg) =>
+//     <li key={msg}>{msg}</li>
+// );
 
 class ChatHistory extends React.Component<ChatHistoryProps, {}> {
     render() {
         return (
-        <div className="chatHistory">
-            <ul>{chatItems}</ul>
+        <div>
+            <ul id="messages"></ul>
         </div>
         );
     }

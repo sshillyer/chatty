@@ -1,9 +1,13 @@
 // CITE: https://socket.io/get-started/chat/ 
+// CITE: https://medium.com/@liheyse/react-server-side-rendering-ssr-with-express-and-css-modules-722ef0cc8fa0
 
-
+import * as React from 'react';
 import * as express from 'express';
 import * as sio from 'socket.io';
 import * as http from 'http';
+import { renderToString } from 'react-dom/server';
+import App from './components/app';
+import template from './template';
 
 // TODO: Could encapsulate this into a server class
 const serverPort: number = process.env.PORT || 3000;
@@ -18,10 +22,20 @@ app.listen(serverPort, () => {
 
 
 // Routes
-app.get('/', function (req, res) {
+app.get('/', (req, res) => {
     // For now we just send a static page with embedded js that allows user to go back and forth
     // TODO: Make this render a REACT component composed of the login screen and boilerplate template
-    res.sendFile(__dirname + '/index.html');
+    
+    // res.sendFile(__dirname + '/index.html'); // This line will render index.html in the build folder which was just a placeholder to test the sockets.io functionality / prototype of the interface.
+
+    // BEGINNING OF CONCEPTS FROM https://medium.com/@liheyse/react-server-side-rendering-ssr-with-express-and-css-modules-722ef0cc8fa0
+    const appString: string = renderToString(<App />);
+
+    res.send(template({
+        body: appString,
+        title: 'SSH! Chat'
+    }));
+    // END TUTORIAL STUFF
 });
 
 
