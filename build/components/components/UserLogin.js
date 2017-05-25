@@ -11,7 +11,3 @@ class UserLogin extends React.Component {
     }
 }
 exports.default = UserLogin;
-/*<form>
-    <input type="text" name="username" defaultValue={this.props.username} />
-    <input type="submit" value="Log On"/>
-</form>*/

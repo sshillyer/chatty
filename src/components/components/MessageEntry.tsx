@@ -20,8 +20,6 @@ class MessageEntry extends React.Component<MessageEntryProps, {}> {
         </div>
         );
     }
-
-    
 }
 
 export default MessageEntry;

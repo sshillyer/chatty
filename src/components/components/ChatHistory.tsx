@@ -4,11 +4,6 @@ interface ChatHistoryProps {
     // messages: string[];
 }
 
-// TODO: Eliminate this Test code
-// const messages = ["First message", "second message", "Another message"];
-// const chatItems = messages.map((msg) =>
-//     <li key={msg}>{msg}</li>
-// );
 
 class ChatHistory extends React.Component<ChatHistoryProps, {}> {
     render() {
@@ -19,4 +14,5 @@ class ChatHistory extends React.Component<ChatHistoryProps, {}> {
         );
     }
 }
+
 export default ChatHistory;
