@@ -33,9 +33,8 @@ app.listen(serverPort, () => {
 });
 
 
-// Routes
+// Pre-renders App (containing only UserLogin component)
 app.get('/', (req, res) => {
-    // CITE: https://medium.com/@liheyse/react-server-side-rendering-ssr-with-express-and-css-modules-722ef0cc8fa0
     const appString: string = renderToString(<App />);
 
     res.send(template({
@@ -44,6 +43,7 @@ app.get('/', (req, res) => {
     }));
 });
 
+// Pre-rendesr React ChatInterface component
 app.get('/:username', (req, res) => {
     const username = req.params.username;
     const appString: string = renderToString(<ChatInterface username={username} messages={messageHistory}/>);
@@ -55,9 +55,9 @@ app.get('/:username', (req, res) => {
 });
 
 
-// Listening with socket.io to all connections and handling the logic
+// Socket.IO listens for events emitted by client-side JavaScript calls
 io.on('connection', function (socket) {
-    console.log('user connected');
+    console.log('Socket IO connection established');
     
     socket.on('user login', function (username: string) {
         handleUserLogin(username);
@@ -75,19 +75,19 @@ io.on('connection', function (socket) {
 server.listen(8080);
 
 
-
 // SocketIO Handlers
 function handleUserLogin(username: string){
     console.log('Login request: ' + username);
-    let loginMessage: string = 'User "' + username + '" has joined.';
-    
-    io.emit('chat message', loginMessage);
-
-    messageHistory.push(loginMessage);
+    if (username != null && /\S/.test(username)) {
+        let loginMessage: string = 'User "' + username + '" has joined.';
+        io.emit('chat message', loginMessage);
+        messageHistory.push(loginMessage);
+        console.log(username + ' logged in.');
+    }
 }
 
 function handleMessageRequest(message: string) {
-    console.log('Message: ' + message);
+    console.log(message);
     
     let messageObject = new Message(message);
 

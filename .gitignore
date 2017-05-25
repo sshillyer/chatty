@@ -58,5 +58,4 @@ typings/
 .env
 
 # Build subdirectory
-build/*.map
-build/*.js
+build/
