@@ -22,6 +22,8 @@ app.listen(serverPort, () => {
 
 
 // Routes
+// Should I use react routes instead or in addition to this somehow?
+// TODO: Read this tutorial https://scotch.io/tutorials/react-on-the-server-for-beginners-build-a-universal-react-and-node-app
 app.get('/', (req, res) => {
     // res.sendFile(__dirname + '/index.html'); // This line will render index.html in the build folder which was just a placeholder to test the sockets.io functionality / prototype of the interface.
 
