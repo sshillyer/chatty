@@ -59,15 +59,15 @@ app.get('/:username', (req, res) => {
 io.on('connection', function (socket) {
     console.log('Socket IO connection established');
     
-    socket.on('user login', function (username: string) {
-        handleUserLogin(username);
+    socket.on('user:login', function (username: string) {
+        handleUserLogin(username, socket.id);
     });
 
-    socket.on('chat message', function (msg: string) {
+    socket.on('message:send', function (msg: string) {
         handleMessageRequest(msg);
     });
 
-    socket.on('user disconnected', function(username: string) {
+    socket.on('user:disconnect', function(username: string) {
         handleUserDisconnect(username);
     });
 });
@@ -76,13 +76,16 @@ server.listen(8080);
 
 
 // SocketIO Handlers
-function handleUserLogin(username: string){
-    console.log('Login request: ' + username);
+function handleUserLogin(username: string, socketId: string){
     if (username != null && /\S/.test(username)) {
+        console.log('Login request: ' + username);
         let loginMessage: string = 'User "' + username + '" has joined.';
-        io.emit('chat message', loginMessage);
+        io.to(socketId).emit('login:success', username);
+        io.emit('message:received', loginMessage);
         messageHistory.push(loginMessage);
         console.log(username + ' logged in.');
+    }  else {
+        io.to(socketId).emit('login:failure', 'invalid username');
     }
 }
 
@@ -91,7 +94,7 @@ function handleMessageRequest(message: string) {
     
     let messageObject = new Message(message);
 
-    io.emit('chat message', messageObject.toString());
+    io.emit('message:received', messageObject.toString());
 
     messageHistory.push(messageObject.toString());
 }
@@ -100,6 +103,6 @@ function handleUserDisconnect(username: string) {
     let disconnectMessage: string = 'User ' + username + ' has disconnected';
     console.log(disconnectMessage);
 
-    io.emit('chat message', disconnectMessage);
+    io.emit('message:received', disconnectMessage);
     messageHistory.push(disconnectMessage);
 }
