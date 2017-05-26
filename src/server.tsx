@@ -70,6 +70,10 @@ io.on('connection', function (socket) {
     socket.on('user:disconnect', function(username: string) {
         handleUserDisconnect(username);
     });
+
+    socket.on('retrieve:history', function() {
+        handleRetreiveHistory(socket.id);
+    })
 });
 
 server.listen(8080);
@@ -105,4 +109,8 @@ function handleUserDisconnect(username: string) {
 
     io.emit('message:received', disconnectMessage);
     messageHistory.push(disconnectMessage);
+}
+
+function handleRetreiveHistory(socketId: string) {
+    io.to(socketId).emit('history:success', messageHistory);
 }
