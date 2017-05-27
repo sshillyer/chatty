@@ -24,6 +24,7 @@ These tasks need to be completed. This is in rough priority order:
     * & and additional tool that randomizese the node to see if it breaks anything
 * Implement a backend to save the message history
     * Redis
+    * Idea: Make the redis DB primary option but allow it to run using the node server's memory store if the db cannot connect for some reason??
 * Docker
     * Implement a docker container that deploys the server + client
     * Implement a docker container that deploys the Redis server
@@ -41,3 +42,108 @@ You also need the server to be running. From root, run 'tsc --watch' in at one c
 
 ### NOTES
 Need to verify with a fresh git pull that all dependencies are installed properly via above instructions.
+
+
+### REDI notes
+RPUSH messages "messagestring"  // push value to right side of list
+LRANGE messages 0 -1     // Gets all the messages in the list
+LLEN messages  => number of elements in list
+LPOP / RPOP  => remove from left (front) or right (back) of list
+This is helpful:    https://www.sitepoint.com/using-redis-node-js/
+Official docs:      https://redis.io/documentation
+
+#### Installing / Using with node
+npm install redis  // --save?
+
+##### "client" side logic (this would be put into the base chatty app in root dir to send/retreive data)
+
+
+```javascript
+// Need to convert this to typescript...
+var redis = require('redis')
+var client = redis.createClient(); // creates a new client
+
+// Redis uses 127.0.0.1 and 6379 as the hostname:port respectively. They can be provided as params
+var client = redis.createCient(port, host);
+
+// Listen for a connection made and then execute the c/b function
+client.on('connect', function() {
+    console.log('connected');
+});
+
+// This does not RUN the Redis server, it just attempts to connect
+
+// Storing a value:
+client.set('key', 'value');
+client.set(['key', 'value']);
+
+// optional callback:
+client.set('message', 'hey there', function(err, reply) {
+    console.log(reply);
+});
+
+client.get('message', fucntion(err, reply) {
+    console.log(reply);
+});
+
+// Hashmap sets:
+client.hmset('frameworks', 'javascript', 'AngularJS', 'css', 'Bootstrap', 'node', 'Express');
+
+client.hgetall('frameworks', function(err, object) {
+    console.log(object);
+});
+
+// alt syntax
+client.hmset('frameworks', {
+    'javascript': 'AngularJS',
+    'css': 'Bootstrap',
+    'node': 'Express'
+});
+
+// Storing a list:
+
+client.rpush(['messages', 'hello', 'welcome to the party'], function(err, reply) {
+    console.log(reply); // prints '2'
+});
+
+// the first arg is the 'key' for the list and the rest are the elements. The return value is the number of elements inside the key
+client.lrange('messages', 0, -1, function(err, reply) {
+    console.log(reply); // retreives the entire list...!
+});
+
+// sets -- duplicates not allowed
+client.sadd(['tags', 'angularjs', 'backbonejs', 'emberjs'], function(err, reply) {
+    console.log(reply); // 3
+});
+client.smembers('tags', function(err, reply) {
+    console.log(reply);
+});
+
+// Check if exists:
+client.exists('key', function(err, reply) {
+    if (reply === 1) {
+        console.log('exists');
+    } else {
+        console.log('doesn\'t exist');
+    }
+});
+
+// Delete and expire
+client.del('keyname', function(err, reply) {
+    console.log(reply);
+});
+
+
+client.set('key1', 'val1');
+client.expire('key1', 30);  // expire key1 in 30 seconds
+
+// Incrementing
+
+client.set('key1', 10, function() {
+    client.incr('key1', function(err, reply) {
+        console.log(reply); // 11
+    });
+});
+
+
+```
