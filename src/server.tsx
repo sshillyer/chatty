@@ -1,19 +1,9 @@
 // Some doc's referenced
 // CITE: https://socket.io/get-started/chat/ 
-// CITE: https://medium.com/@liheyse/react-server-side-rendering-ssr-with-express-and-css-modules-722ef0cc8fa0
-// CITE: https://scotch.io/tutorials/react-on-the-server-for-beginners-build-a-universal-react-and-node-app
-// CITE: https://medium.com/@liheyse/react-server-side-rendering-ssr-with-express-and-css-modules-722ef0cc8fa0
 
-import * as React from 'react';
 import * as express from 'express';
 import * as sio from 'socket.io';
 import * as http from 'http';
-import { renderToString } from 'react-dom/server';
-
-// React components
-import App from './components/app';
-import ChatInterface from './components/ChatInterface';
-import template from './template';
 
 // Data model(s)
 import Message from './models/Message';
@@ -22,37 +12,10 @@ import Message from './models/Message';
 let messageHistory: string[] = [];
 
 // TODO: Encapsulate this into a server class that instantiates the server and listener
-const serverPort: number = process.env.PORT || 3000;
+const serverPort: number = process.env.PORT || 8080;
 const app: express.Application = express();
 const server: http.Server = http.createServer(app);
 const io: SocketIO.Server = sio(server);
-
-// Run the "app"
-app.listen(serverPort, () => {
-    console.log('Listening at http://localhost:' + serverPort + '/'); // TODO: The replacement isn't happening here
-});
-
-
-// Pre-renders App (containing only UserLogin component)
-app.get('/', (req, res) => {
-    const appString: string = renderToString(<App />);
-
-    res.send(template({
-        body: appString,
-        title: 'SSH Chat'
-    }));
-});
-
-// Pre-rendesr React ChatInterface component
-app.get('/:username', (req, res) => {
-    const username = req.params.username;
-    const appString: string = renderToString(<ChatInterface username={username} messages={messageHistory}/>);
-
-    res.send(template({
-        body: appString,
-        title: 'SSH Chat'
-    }));
-});
 
 
 // Socket.IO listens for events emitted by client-side JavaScript calls
@@ -76,7 +39,7 @@ io.on('connection', function (socket) {
     })
 });
 
-server.listen(8080);
+server.listen(serverPort);
 
 
 // SocketIO Handlers
