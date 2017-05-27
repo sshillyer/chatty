@@ -55,6 +55,13 @@ Official docs:      https://redis.io/documentation
 #### Installing / Using with node
 npm install redis  // --save?
 
+#### Installing Redis itself
+Only available on *Nix
+Guides to setting it up on VBox: 
+* http://resources.infosecinstitute.com/installing-configuring-centos-7-virtualbox/#gref
+* https://wiki.centos.org/HowTos/Virtualization/VirtualBox
+
+
 ##### "client" side logic (this would be put into the base chatty app in root dir to send/retreive data)
 
 
