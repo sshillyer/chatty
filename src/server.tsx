@@ -2,6 +2,7 @@
 // CITE: https://socket.io/get-started/chat/ 
 
 import * as express from 'express';
+import * as path from 'path';
 import * as sio from 'socket.io';
 import * as http from 'http';
 
@@ -16,6 +17,16 @@ const serverPort: number = process.env.PORT || 8080;
 const app: express.Application = express();
 const server: http.Server = http.createServer(app);
 const io: SocketIO.Server = sio(server);
+
+
+app.use(express.static(path.join(__dirname, '../chat2/build')));
+
+app.get('/', function(req, res) {
+    res.sendFile(path.join(__dirname, '../chat2/build', 'index.html'));
+});
+
+app.listen(3001);
+
 
 
 // Socket.IO listens for events emitted by client-side JavaScript calls
