@@ -7,7 +7,6 @@ import * as sio from 'socket.io';
 import * as http from 'http';
 import * as redis from 'redis';
 
-
 // Data model(s)
 import Message from './models/Message';
 
@@ -112,32 +111,24 @@ function pushMessageToDatabase(message: string) {
 }
 
 
-
-
 // Cannot figure out why 'this' isn't binding in the functions (including just the socket.on(connection) section)
 
-
-
 // class Server {
-//     messageHistory: string[];
 //     serverPort: number;
 //     socketIoPort: number;
 //     app: express.Application;
 //     server: http.Server;
 //     io: SocketIO.Server;
+//     dbClient: any;
 
 //     constructor() {
 //         this.setupChatServer = this.setupChatServer.bind(this);
 //         this.setupSocketIOListener = this.setupSocketIOListener.bind(this);
-//         // this.handleUserLogin = this.handleUserLogin.bind(this);
-//         // this.handleMessageRequest = this.handleMessageRequest.bind(this);
-//         // this.handleUserDisconnect = this.handleUserDisconnect.bind(this);
-//         // this.handleRetreiveHistory = this.handleRetreiveHistory.bind(this);
+//         this.setupDatabase = this.setupDatabase.bind(this);
 //     }
 
 //     init(this: Server) {
 //         this.setupChatServer();
-//         this.setupSocketIOListener();
 //     }
 
 //     setupChatServer= () => {
@@ -155,6 +146,19 @@ function pushMessageToDatabase(message: string) {
 
 //         this.app.listen(this.serverPort);
 //         console.log('Chatty:chat-server listening on port ' + this.serverPort);
+//         this.setupSocketIOListener();
+//         this.setupDatabase();
+//     }
+
+//     setupDatabase = () => {
+//         this.dbClient = redis.createClient();
+
+//         // Handlers for database client events
+//         this.dbClient.on('error', (err: any) => console.log(err) );
+//         // Examples, not used:
+//         // dbClient.on('ready', (msg: any) => console.log('Redis is ready') );
+//         // dbClient.on('connect', () => console.log('Redis:connect'));
+//         // dbClient.on('end', () => console.log('Redis client connection closed'));
 //     }
 
 //     setupSocketIOListener = (): any => {
@@ -164,38 +168,22 @@ function pushMessageToDatabase(message: string) {
 
 //             // user:login :: chat client sends username as a string from main login
 //             socket.on('user:login', function (this: Server, username: string) {
-//                 if (username != null && /\S/.test(username)) {
-//                     console.log('Login request: ' + username);
-//                     let loginMessage: string = 'User "' + username + '" has joined.';
-//                     this.io.to(socket.id).emit('login:success', username);
-//                     this.io.emit('message:received', loginMessage);
-//                     this.messageHistory.push(loginMessage);
-//                     console.log(username + ' logged in.');
-//                 }  else {
-//                     this.io.to(socket.id).emit('login:failure', 'invalid username');
-//                 }
+//                 handleUserLogin(this.io, this.dbClient, username, socket.id);
 //             });
 
 //             // message:send :: client sends message
 //             socket.on('message:send', function (this: Server, message: string) {
-//                 console.log(message);
-//                 let messageObject = new Message(message);
-//                 this.io.emit('message:received', messageObject.toString());
-//                 this.messageHistory.push(messageObject.toString());
+//                 handleMessageRequest(this.io, this.dbClient, message);
 //             });
 
 //             // user:disconnect :: client closes / about to close connection
 //             socket.on('user:disconnect', function(this: Server, username: string) {
-//                 let disconnectMessage: string = 'User ' + username + ' has disconnected';
-//                 console.log(disconnectMessage);
-
-//                 this.io.emit('message:received', disconnectMessage);
-//                 this.messageHistory.push(disconnectMessage);
+//                 handleUserDisconnect(this.io, this.dbClient, username);
 //             });
 
 //             // retreive:history :: client login was succesful, retreive history
 //             socket.on('retrieve:history', function(this: Server) {
-//                 this.io.to(socket.id).emit('history:success', this.messageHistory);
+//                 handleRetreiveHistory(this.io, this.dbClient, socket.id);
 //             })
 //         });
 
@@ -206,3 +194,53 @@ function pushMessageToDatabase(message: string) {
 
 // const server = new Server();
 // server.init();
+
+
+// // SocketIO Handlers
+// function handleUserLogin(io: SocketIO.Server, dbClient: any, username: string, socketId: string){
+//     console.log('Login request: ' + username);
+//     if (username != null && /\S/.test(username)) {
+//         // Successful login - let new client know, add to db, and broadcast new message
+//         io.to(socketId).emit('login:success', username);
+//         let loginMessage: string = username + ' has joined the chat.';  
+//         io.emit('message:received', loginMessage);
+//         // messageHistory.push(loginMessage); // old local storage
+//         pushMessageToDatabase(dbClient, loginMessage);
+//         console.log(username + ' logged in.');
+//     }  else {
+//         // Failed - emit a failure and let client handle
+//         io.to(socketId).emit('login:failure', 'invalid username');
+//     }
+// }
+
+// function handleMessageRequest(io: SocketIO.Server, dbClient: any, message: string) {
+//     console.log(message);
+//     let messageObject = new Message(message);
+
+//     io.emit('message:received', messageObject.toString());
+
+//     // messageHistory.push(messageObject.toString()); // old local storage
+//     pushMessageToDatabase(dbClient, messageObject.toString());
+// }
+
+// function handleUserDisconnect(io: SocketIO.Server, dbClient: any, username: string) {
+//     let disconnectMessage: string = 'User ' + username + ' has disconnected';
+//     console.log(disconnectMessage);
+
+//     io.emit('message:received', disconnectMessage);
+//     // messageHistory.push(disconnectMessage); // old local storage
+//     pushMessageToDatabase(dbClient, disconnectMessage);
+    
+// }
+
+// function handleRetreiveHistory(io: SocketIO.Server, dbClient: any, socketId: string) {
+//     dbClient.lrange('messages', 0, -1, function(err: any, reply: any) {
+//         io.to(socketId).emit('history:success', reply);    
+//     });   
+// }
+
+// function pushMessageToDatabase(dbClient: any, message: string) {
+//     dbClient.rpush(['messages', message], function(err: any, reply: any) {
+//         console.log(reply + ' messages pushed to database');
+//     });
+// }
