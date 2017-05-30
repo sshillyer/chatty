@@ -11,9 +11,8 @@ import * as redis from 'redis';
 // Data model(s)
 import Message from './models/Message';
 
-
 //  Setup simple array of strings to store the arrays in. TODO: Could make a UserMessage class that encapsulates username and message (+ timestamps etc.)
-let messageHistory: string[] = [];
+// let messageHistory: string[] = [];
 
 // TODO: Encapsulate this into a server class that instantiates the server and listener
 const serverPort: number = process.env.PORT || 3001;
@@ -65,14 +64,17 @@ server.listen(socketIOPort);
 
 // SocketIO Handlers
 function handleUserLogin(username: string, socketId: string){
+    console.log('Login request: ' + username);
     if (username != null && /\S/.test(username)) {
-        console.log('Login request: ' + username);
-        let loginMessage: string = 'User "' + username + '" has joined.';
+        // Successful login - let new client know, add to db, and broadcast new message
         io.to(socketId).emit('login:success', username);
+        let loginMessage: string = username + ' has joined the chat.';  
         io.emit('message:received', loginMessage);
-        messageHistory.push(loginMessage);
+        // messageHistory.push(loginMessage); // old local storage
+        pushMessageToDatabase(loginMessage);
         console.log(username + ' logged in.');
     }  else {
+        // Failed - emit a failure and let client handle
         io.to(socketId).emit('login:failure', 'invalid username');
     }
 }
@@ -82,10 +84,9 @@ function handleMessageRequest(message: string) {
     let messageObject = new Message(message);
 
     io.emit('message:received', messageObject.toString());
-    messageHistory.push(messageObject.toString());
-    dbClient.rpush(['messages', messageObject.toString()], function(err: any, reply: any) {
-        console.log(reply); // prints '2'
-    });
+
+    // messageHistory.push(messageObject.toString()); // old local storage
+    pushMessageToDatabase(messageObject.toString());
 }
 
 function handleUserDisconnect(username: string) {
@@ -93,14 +94,22 @@ function handleUserDisconnect(username: string) {
     console.log(disconnectMessage);
 
     io.emit('message:received', disconnectMessage);
-    messageHistory.push(disconnectMessage);
+    // messageHistory.push(disconnectMessage); // old local storage
+    pushMessageToDatabase(disconnectMessage);
+    
 }
 
 function handleRetreiveHistory(socketId: string) {
-    io.to(socketId).emit('history:success', messageHistory);
+    dbClient.lrange('messages', 0, -1, function(err: any, reply: any) {
+        io.to(socketId).emit('history:success', reply);    
+    });   
 }
 
-
+function pushMessageToDatabase(message: string) {
+    dbClient.rpush(['messages', message], function(err: any, reply: any) {
+        console.log(reply + ' messages pushed to database');
+    });
+}
 
 
 
