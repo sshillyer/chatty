@@ -34,6 +34,9 @@ app.listen(serverPort);
 
 // Attempt to connect to Redis server
 dbClient.on('error', (err: any) => console.log(err) );
+dbClient.on('ready', (msg: any) => console.log('Redis is ready') );
+dbClient.on('connect', () => console.log('Redis:connect'));
+dbClient.on('end', () => console.log('Redis client connection closed'));
 
 
 // Socket.IO listens for events emitted by client-side JavaScript calls
@@ -76,12 +79,13 @@ function handleUserLogin(username: string, socketId: string){
 
 function handleMessageRequest(message: string) {
     console.log(message);
-    
     let messageObject = new Message(message);
 
     io.emit('message:received', messageObject.toString());
-
     messageHistory.push(messageObject.toString());
+    dbClient.rpush(['messages', messageObject.toString()], function(err: any, reply: any) {
+        console.log(reply); // prints '2'
+    });
 }
 
 function handleUserDisconnect(username: string) {
