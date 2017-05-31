@@ -14,6 +14,7 @@ import Message from './models/Message';
 // let messageHistory: string[] = [];
 
 // TODO: Encapsulate this into a server class that instantiates the server and listener
+
 const serverPort: number = process.env.PORT || 3001;
 const app: express.Application = express();
 const server: http.Server = http.createServer(app);
@@ -21,48 +22,56 @@ const socketIOPort: number = process.env.PORT || 8080;
 const io: SocketIO.Server = sio(server);
 const dbClient: any = redis.createClient();
 
-
-// Set server to dish up the React App at root using static build folder
-app.use(express.static(path.join(__dirname, '../chat2/build')));
-app.get('/', function(req, res) {
-    res.sendFile(path.join(__dirname, '../chat2/build', 'index.html'));
-});
-
-app.listen(serverPort);
-
-// Attempt to connect to Redis server
-dbClient.on('error', (err: any) => console.log(err) );
-dbClient.on('ready', (msg: any) => console.log('Redis is ready') );
-dbClient.on('connect', () => console.log('Redis:connect'));
-dbClient.on('end', () => console.log('Redis client connection closed'));
-
-
-// Socket.IO listens for events emitted by client-side JavaScript calls
-io.on('connection', function (socket) {
-    console.log('Socket IO connection established');
-    
-    socket.on('user:login', function (username: string) {
-        handleUserLogin(username, socket.id);
+function setupChatServer() {
+    // Set server to dish up the React App at root using static build folder
+    app.use(express.static(path.join(__dirname, '../chat2/build')));
+    app.get('/', function(req, res) {
+        res.sendFile(path.join(__dirname, '../chat2/build', 'index.html'));
     });
 
-    socket.on('message:send', function (msg: string) {
-        handleMessageRequest(msg);
+    app.listen(serverPort);
+}
+
+
+function setupDatabase() {
+    dbClient.on('error', (err: any) => console.log(err) );
+    dbClient.on('ready', (msg: any) => console.log('Redis is ready') );
+    dbClient.on('connect', () => console.log('Redis:connect'));
+    dbClient.on('end', () => console.log('Redis client connection closed'));
+};
+
+function setupSocketIO() {
+    // Socket.IO listens for events emitted by client-side JavaScript calls
+    io.on('connection', function (socket) {
+        console.log('Socket IO connection established');
+        
+        socket.on('user:login', function (username: string) {
+            handleUserLogin(username, socket.id);
+        });
+
+        socket.on('message:send', function (msg: string) {
+            handleMessageRequest(msg);
+        });
+
+        socket.on('user:disconnect', function(username: string) {
+            handleUserDisconnect(username);
+        });
+
+        socket.on('retrieve:history', function() {
+            handleRetreiveHistory(socket.id);
+        })
     });
 
-    socket.on('user:disconnect', function(username: string) {
-        handleUserDisconnect(username);
-    });
+    server.listen(socketIOPort);
+}
 
-    socket.on('retrieve:history', function() {
-        handleRetreiveHistory(socket.id);
-    })
-});
-
-server.listen(socketIOPort);
+setupChatServer();
+setupDatabase();
+setupSocketIO();
 
 
 // SocketIO Handlers
-function handleUserLogin(username: string, socketId: string){
+function handleUserLogin(username: string, socketId: string): string {
     console.log('Login request: ' + username);
     if (username != null && /\S/.test(username)) {
         // Successful login - let new client know, add to db, and broadcast new message
@@ -72,9 +81,11 @@ function handleUserLogin(username: string, socketId: string){
         // messageHistory.push(loginMessage); // old local storage
         pushMessageToDatabase(loginMessage);
         console.log(username + ' logged in.');
+        return('Login Success');
     }  else {
         // Failed - emit a failure and let client handle
         io.to(socketId).emit('login:failure', 'invalid username');
+        return('Login Fail');
     }
 }
 
@@ -109,6 +120,8 @@ function pushMessageToDatabase(message: string) {
         console.log(reply + ' messages pushed to database');
     });
 }
+
+export { setupChatServer, setupDatabase, setupSocketIO, handleUserLogin, handleMessageRequest, handleRetreiveHistory, handleUserDisconnect, pushMessageToDatabase };
 
 
 // Cannot figure out why 'this' isn't binding in the functions (including just the socket.on(connection) section)

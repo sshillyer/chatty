@@ -2,22 +2,43 @@
 Chat server developed using Typescript, Express, and Socket IO. It serves the app contained in /chat2 and handles the socket io requests as well.
 
 ### Install all dependencies:
+```
 $ npm install
 $ cd chat2
 $ npm install
-
-# Ensure Typescript is installed:
+```
+### Ensure Typescript is installed:
+```
 $ npm install typescript -g
-
+```
 ### Build server:
+```
 $ tsc  # From root
-
+```
 ### Launch server:
+```
 $ node build/server.js
+```
 
 ### Build React client:
+```
 $ cd chat2 # From root
 $ npm run build
+```
+
+### Install Redis
+```
+wget http://download.redis.io/redis-stable.tar.gz
+tar xvzf redis-stable.tar.gz
+cd redis-stable
+make
+```
+
+### Start Redis server
+```
+$ src/redis-server  # from the redis folder (e.g. root/redis-3.2.9)
+```
+###
 
 ### Launch client
 Navigate to localhost:3001 (default) or whatever port 'Chatty:chat-server' says it is listening on.
