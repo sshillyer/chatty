@@ -22,14 +22,18 @@ const socketIOPort: number = process.env.PORT || 8080;
 const io: SocketIO.Server = sio(server);
 const dbClient: any = redis.createClient();
 
-function setupChatServer() {
+function setupChatServer(serverPort: number): number {
     // Set server to dish up the React App at root using static build folder
     app.use(express.static(path.join(__dirname, '../chat2/build')));
     app.get('/', function(req, res) {
         res.sendFile(path.join(__dirname, '../chat2/build', 'index.html'));
     });
 
-    app.listen(serverPort);
+    app.listen(serverPort).on('error', () => {
+        return -1;
+    });
+
+    return serverPort;
 }
 
 
@@ -40,7 +44,7 @@ function setupDatabase() {
     dbClient.on('end', () => console.log('Redis client connection closed'));
 };
 
-function setupSocketIO() {
+function setupSocketIO(socketIOPort: number) {
     // Socket.IO listens for events emitted by client-side JavaScript calls
     io.on('connection', function (socket) {
         console.log('Socket IO connection established');
@@ -65,37 +69,33 @@ function setupSocketIO() {
     server.listen(socketIOPort);
 }
 
-setupChatServer();
+setupChatServer(serverPort);
 setupDatabase();
-setupSocketIO();
+setupSocketIO(socketIOPort);
 
 
 // SocketIO Handlers
-function handleUserLogin(username: string, socketId: string): string {
+function handleUserLogin(username: string, socketId: string): any {
     console.log('Login request: ' + username);
     if (username != null && /\S/.test(username)) {
         // Successful login - let new client know, add to db, and broadcast new message
         io.to(socketId).emit('login:success', username);
         let loginMessage: string = username + ' has joined the chat.';  
         io.emit('message:received', loginMessage);
-        // messageHistory.push(loginMessage); // old local storage
         pushMessageToDatabase(loginMessage);
         console.log(username + ' logged in.');
         return('Login Success');
     }  else {
         // Failed - emit a failure and let client handle
         io.to(socketId).emit('login:failure', 'invalid username');
-        return('Login Fail');
+        throw new Error("Login Failed");
     }
 }
 
 function handleMessageRequest(message: string) {
     console.log(message);
     let messageObject = new Message(message);
-
     io.emit('message:received', messageObject.toString());
-
-    // messageHistory.push(messageObject.toString()); // old local storage
     pushMessageToDatabase(messageObject.toString());
 }
 
