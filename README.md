@@ -26,15 +26,11 @@ If for some reason the port for SocketIO is not 8080, the chat2 React client wou
 ## TODO:
 These tasks need to be completed. This is in rough priority order:
 
-* Implement the following testing components:
-    * Mocha
-    * Chai
+* Implement the following testing components: [[ Partially completed ]]
+    * Mocha [X]
+    * Chai [X]
     * Instanbul (Code coverage goal 60%)
     * Sinon
-    * & and additional tool that randomizese the node to see if it breaks anything
-* Implement a backend to save the message history
-    * Redis
-    * Idea: Make the redis DB primary option but allow it to run using the node server's memory store if the db cannot connect for some reason??
 * Docker
     * Implement a docker container that deploys the server + client
     * Implement a docker container that deploys the Redis server
@@ -49,6 +45,26 @@ For the REACT app, cd into chat2/ and type 'npm start' to deploy the app in deve
 You also need the server to be running. From root, run 'tsc --watch' in at one command line and 'nodemon bulid/server.js' in another.
     (The first rebuilds on save, the second relaunches the server on file changes)
 
+
+## Docker Cheat Sheet
+```
+docker build -t friendlyname .  # Create image using this directory's Dockerfile
+docker run -p 4000:80 friendlyname  # Run "friendlyname" mapping port 4000 to 80
+docker run -d -p 4000:80 friendlyname         # Same thing, but in detached mode
+docker ps                                 # See a list of all running containers
+docker stop <hash>                     # Gracefully stop the specified container
+docker ps -a           # See a list of all containers, even the ones not running
+docker kill <hash>                   # Force shutdown of the specified container
+docker rm <hash>              # Remove the specified container from this machine
+docker rm $(docker ps -a -q)           # Remove all containers from this machine
+docker images -a                               # Show all images on this machine
+docker rmi <imagename>            # Remove the specified image from this machine
+docker rmi $(docker images -q)             # Remove all images from this machine
+docker login             # Log in this CLI session using your Docker credentials
+docker tag <image> username/repository:tag  # Tag <image> for upload to registry
+docker push username/repository:tag            # Upload tagged image to registry
+docker run username/repository:tag                   # Run image from a registry
+```
 
 ### NOTES
 Need to verify with a fresh git pull that all dependencies are installed properly via above instructions.
