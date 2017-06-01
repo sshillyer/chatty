@@ -7,13 +7,6 @@ WORKDIR /usr/src/app
 
 # Copy chat-server src files to container
 COPY . /usr/src/app
-# COPY *.json /usr/src/app/
-# COPY src/* /usr/src/app/
-# COPY src/models
-
-# Copy chat2 React app files to container
-# COPY chat2/*.json /usr/src/app/chat2/
-# COPY chat2/src/* /usr/src/app/chat2/src/
 
 # Install Global modules for compiling TS and keeping node running
 RUN npm install typescript -g

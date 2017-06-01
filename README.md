@@ -1,33 +1,49 @@
 # Chat server + React APP client
-Chat server developed using Typescript, Express, and Socket IO. It serves the app contained in /chat2 and handles the socket io requests as well.
+Chat server developed using Typescript, Express, and Socket IO. It serves the app contained in /chat2 and handles the socket io requests as well. This app has been dockerized to deploy as a separate server and client (in one Docker container) that works with a linked Redis docker container.
 
-## Easy Deployment using Docker
+## Deploy using Docker
+* This requires a machine with Docker installed and has no other dependencies.
+* All commands are from root of the project.
+* This is the preferred error-proof method of setting up the project.
+
+1. Build and deploy the redis server container:
+```
+$ docker build -t sshillyer/redis .
+$ docker run --name redis -d -p 6379:6379 sshillyer/redis
+```
+
+2. Build and deploy the server and client:
 ```
 $ docker network create chatnet
-$ docker build -t sshillyer/chatty-app .
-Build and deploy the redis server container
-$ docker run -itd --network=chatnet --name chatty -p 3001:3001 -p 8080:8080 sshillyer/chatty
-
- // DON"T THINK THIS WORKS: // docker run -d --name chatty -p 3001:3001  --link redis:redis sshillyer/chatty
+$ docker build -t sshillyer/chatty .
+$ docker run -itd --name chatty -P -p 3001:3001 -p 8080:8080 --link redis:redis sshillyer/chatty
 ```
+
+You should now be able to browse to the chat application at localhost 3001. Port 8080 is used for socket.io communication; port 3001 is the route used by express to serve up the static built react client. Port 6379 is the default Redis port.
+
+## Manual Installation without Docker
 
 ### Install all dependencies:
+From parent directory:
 ```
+$ git clone https://github.com/sshillyer/chatty
+$ cd chatty
 $ npm install
 $ cd chat2
 $ npm install
 ```
-### Ensure Typescript is installed:
+### Ensure Typescript and Nodemon are installed:
 ```
 $ npm install typescript -g
+$ npm install nodemon -g
 ```
 ### Build server:
 ```
 $ tsc  # From root
 ```
-### Launch server:
+### Launch chat-server that hosts client and manages connections:
 ```
-$ node build/server.js
+$ nodemon build/server.js
 ```
 
 ### Build React client:
@@ -48,24 +64,20 @@ make
 ```
 $ src/redis-server  # from the redis folder (e.g. root/redis-3.2.9)
 ```
-###
+
 ### Launch client
-Navigate to localhost:3001 (default) or whatever port 'Chatty:chat-server' says it is listening on.
-If for some reason the port for SocketIO is not 8080, the chat2 React client would need to be updated?? (Not sure if this is true, double check)
+Navigate to localhost:3001 (default) in a browser
+
 
 ## TODO:
 These tasks need to be completed. This is in rough priority order:
 
-* Implement the following testing components: [[ Partially completed ]]
-    * Mocha [X]
+* Implement additional tests using the following libraries:
+    * Mocha [X] 
     * Chai [X]
     * Instanbul (Code coverage goal 60%)
     * Sinon
-* Docker
-    * Implement a docker container that deploys the server + client
-    * Implement a docker container that deploys the Redis server
 
-Not essential for the project specifications, these items can be done if time permits:
 * Cleanup:
     * Auto-scroll to bottom of the view to see most recently history (Newest messages are displayed at end of list and drop out of view until scrolled to)
     * Unique usernames only, time stamps, etc.
@@ -75,6 +87,7 @@ For the REACT app, cd into chat2/ and type 'npm start' to deploy the app in deve
 You also need the server to be running. From root, run 'tsc --watch' in at one command line and 'nodemon bulid/server.js' in another.
     (The first rebuilds on save, the second relaunches the server on file changes)
 
+From there, any changes to chat2 or server source code will be recompiled and refresh automatically
 
 ## Docker Cheat Sheet
 ```
@@ -115,6 +128,7 @@ docker-machine scp docker-compose.yml myvm1:~     # Copy file to node's home dir
 docker-machine ssh myvm1 "docker stack deploy -c <file> <app>"   # Deploy an app
 ```
 
+### Docker workflow:
 1. Set up the Dockerfile
 2. Set up a docker-compose.yml
 3. docker swarm init
@@ -122,11 +136,8 @@ docker-machine ssh myvm1 "docker stack deploy -c <file> <app>"   # Deploy an app
 5. You can see all containers: docker stack ps nameofapp
 6. docker stack rm nameofapp  # kills the stack
 
-### NOTES
-Need to verify with a fresh git pull that all dependencies are installed properly via above instructions.
 
-
-### REDI notes
+## Redis notes
 RPUSH messages "messagestring"  // push value to right side of list
 LRANGE messages 0 -1     // Gets all the messages in the list
 LLEN messages  => number of elements in list
@@ -134,19 +145,19 @@ LPOP / RPOP  => remove from left (front) or right (back) of list
 This is helpful:    https://www.sitepoint.com/using-redis-node-js/
 Official docs:      https://redis.io/documentation
 
-#### Installing / Using with node
-npm install redis  // --save?
+### Installing Node module and @types
+npm install redis --save
+npm install @types/redis
 
-#### Installing Redis itself
-Only available on *Nix
+### Installing Redis itself
+Only available on Unix systems
 Guides to setting it up on VBox: 
 * http://resources.infosecinstitute.com/installing-configuring-centos-7-virtualbox/#gref
 * https://wiki.centos.org/HowTos/Virtualization/VirtualBox
 
+Easier option: Deploy official Docker redis container with default ports exposed and enjoy!
 
-##### "client" side logic (this would be put into the base chatty app in root dir to send/retreive data)
-
-
+#### Node.JS Server/Client logic
 ```javascript
 // Need to convert this to typescript...
 var redis = require('redis')
@@ -233,6 +244,4 @@ client.set('key1', 10, function() {
         console.log(reply); // 11
     });
 });
-
-
 ```
