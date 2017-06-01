@@ -6,15 +6,15 @@ Chat server developed using Typescript, Express, and Socket IO. It serves the ap
 * All commands are from root of the project.
 * This is the preferred error-proof method of setting up the project.
 
-1. Build and deploy the redis server container:
+1. Build and deploy the redis server container. From project root:
 ```
+$ cd chatty-db
 $ docker build -t sshillyer/redis .
 $ docker run --name redis -d -p 6379:6379 sshillyer/redis
 ```
 
-2. Build and deploy the server and client:
+2. Build and deploy the server and client. From project root:
 ```
-$ docker network create chatnet
 $ docker build -t sshillyer/chatty .
 $ docker run -itd --name chatty -P -p 3001:3001 -p 8080:8080 --link redis:redis sshillyer/chatty
 ```
