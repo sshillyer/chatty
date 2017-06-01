@@ -20,7 +20,9 @@ const app: express.Application = express();
 const server: http.Server = http.createServer(app);
 const socketIOPort: number = process.env.PORT || 8080;
 const io: SocketIO.Server = sio(server);
-const dbClient: any = redis.createClient();
+const dbClient: any = redis.createClient({
+    host: 'redis'
+});
 
 function setupChatServer(serverPort: number): number {
     // Set server to dish up the React App at root using static build folder

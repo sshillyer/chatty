@@ -1,0 +1,5 @@
+node_modules
+npm-debug.log
+chat2/node_modules
+build
+chat2/build

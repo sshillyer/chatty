@@ -52,6 +52,7 @@
   },
   "exclude": [
     "node_modules",
-    "chat2"
+    "chat2",
+    "**/test.ts"
   ]
 }
