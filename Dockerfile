@@ -10,7 +10,7 @@ COPY . /usr/src/app
 
 # Install Global modules for compiling TS and keeping node running
 RUN npm install typescript -g
-RUN npm install nodemon -g
+RUN npm install forever -g
 
 # Install chat-server's dependencies per package.json
 RUN npm install
@@ -27,4 +27,4 @@ EXPOSE 8080
 
 # Launch chat-server
 WORKDIR /usr/src/app
-CMD ["nodemon", "build/server.js"]
+CMD ["forever", "build/server.js"]

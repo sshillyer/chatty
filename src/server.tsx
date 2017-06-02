@@ -10,15 +10,16 @@ import * as redis from 'redis';
 // Data model(s)
 import Message from './models/Message';
 
-const serverPort: number = process.env.PORT || 3001;
+const serverPort: number = process.env.PORT || 3000;
 const app: express.Application = express();
 const server: http.Server = http.createServer(app);
 const socketIOPort: number = process.env.PORT || 8080;
+// const socketIOPort: number = serverPort;
 const io: SocketIO.Server = sio(server);
 
 // THIS WORKS WITH NON SWARM:
-const redisHost  = process.env.REDIS_PORT_6379_TCP_ADDR;
-const redisPort  = process.env.REDIS_PORT_6379_TCP_PORT;
+const redisHost  = 6379;
+const redisPort  = 'redis';
 const dbClient: any = redis.createClient(redisPort, redisHost);
 
 // TRYING THIS WITH SWARM STYLE
