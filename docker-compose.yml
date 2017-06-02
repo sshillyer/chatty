@@ -1,27 +1,24 @@
 version: "3"
 services:
-  web:
-    image: sshillyer/chatty:latest
-    # deploy:
-    #   replicas: 5
-    #   resources:
-    #     limits:
-    #       cpus: "0.1"
-    #       memory: 50M
-    #   restart_policy:
-    #     condition: on-failure
+  chatty:
+    image: sshillyer/chatty
+    deploy:
+      replicas: 5
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 50M
+      restart_policy:
+        condition: on-failure
     ports:
-      - "3001:3001"
-      - "8080:8080"
+      - "3000:3000"
     networks:
-      - webnet
-    environment:
-      - REDIS_HOST="redis://db:6379"
+      - chatnet
   redis:
     image: sshillyer/redis
-    # ports:
-    #   - "6379:6379"
+    ports:
+      - "6379:6379"
     networks:
-      - webnet
+      - chatnet
 networks:
-  webnet:
+  chatnet:

@@ -6,28 +6,25 @@ Chat server developed using Typescript, Express, and Socket IO. It serves the ap
 * All commands are from root of the project.
 * This is the preferred error-proof method of setting up the project.
 
-1. Build and deploy the redis server container. From project root:
-```
-$ cd chatty-db
-$ docker build -t sshillyer/redis .
-$ docker run --name redis -d -p 6379:6379 sshillyer/redis
-```
-
-2. Build and deploy the server and client. From project root:
+1. Build Docker images
 ```
 $ docker build -t sshillyer/chatty .
-$ docker run -itd --name chatty -P -p 3001:3001 -p 8080:8080 --link redis:redis sshillyer/chatty
+$ cd chatty-db
+$ docker build -t sshillyer/redis .
+
+```
+2. Set up a docker network
+```
+docker network create chattynet
 ```
 
-You should now be able to browse to the chat application at localhost 3001. Port 8080 is used for socket.io communication; port 3001 is the route used by express to serve up the static built react client. Port 6379 is the default Redis port.
-
+3. Run the images on that network
 ### Setting up on a custom network
 ```
 docker network create chattynet
 docker run --name redis -d -p 6379:6379 --network=chattynet sshillyer/redis
-docker run -itd --name chatty -p 3001:3001 --network=chattynet sshillyer/chatty
+docker run -itd --name chatty -p 3000:3000 --network=chattynet sshillyer/chatty
 ```
-
 
 
 ### Making a swarm
@@ -35,24 +32,12 @@ $ docker swarm init
 $ docker stack deploy -c docker-compose.yml chatty
 
 
-
 ### Teardown
 ```
-docker stop $(docker ps -a -q)
+docker kill $(docker ps -a -q)
 docker rm $(docker ps -a -q)
 ```
-Or manually kill processes:
-$ docker kill redis
-```
-#### If a single server:
-```
-$ docker kill chatty
-```
 
-#### If a swarm:
-```
-$ docker stack rm chatty
-```
 
 ## Manual Installation without Docker
 
@@ -99,7 +84,7 @@ $ src/redis-server  # from the redis folder (e.g. root/redis-3.2.9)
 ```
 
 ### Launch client
-Navigate to localhost:3001 (default) in a browser
+Navigate to localhost:3000 (default) in a browser
 
 
 ## TODO:

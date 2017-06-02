@@ -13,13 +13,13 @@ import Message from './models/Message';
 const serverPort: number = process.env.PORT || 3000;
 const app: express.Application = express();
 const server: http.Server = http.createServer(app);
-const socketIOPort: number = process.env.PORT || 8080;
-// const socketIOPort: number = serverPort;
+// const socketIOPort: number = process.env.PORT || 8080;
+const socketIOPort: number = serverPort;
 const io: SocketIO.Server = sio(server);
 
 // THIS WORKS WITH NON SWARM:
-const redisHost  = 6379;
-const redisPort  = 'redis';
+const redisHost  = 'redis'; // 'localhost'  if serving locally
+const redisPort  = 6379;
 const dbClient: any = redis.createClient(redisPort, redisHost);
 
 // TRYING THIS WITH SWARM STYLE
@@ -31,11 +31,12 @@ const dbClient: any = redis.createClient(redisPort, redisHost);
 function setupChatServer(serverPort: number): number {
     // Set server to dish up the React App at root using static build folder
     app.use(express.static(path.join(__dirname, '../chat2/build')));
+
     app.get('/', function(req, res) {
         res.sendFile(path.join(__dirname, '../chat2/build', 'index.html'));
     });
 
-    app.listen(serverPort).on('error', () => {
+    server.listen(serverPort).on('error', () => {
         return -1;
     });
 
