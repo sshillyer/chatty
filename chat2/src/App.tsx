@@ -2,6 +2,8 @@ import * as React from 'react';
 import UserLogin from './UserLogin';
 import ChatInterface from './ChatInterface';
 import * as io from 'socket.io-client';
+// import * as ip from 'ip';
+
 import './App.css';
 
 interface AppProps {

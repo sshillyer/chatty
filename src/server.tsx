@@ -15,9 +15,17 @@ const app: express.Application = express();
 const server: http.Server = http.createServer(app);
 const socketIOPort: number = process.env.PORT || 8080;
 const io: SocketIO.Server = sio(server);
+
+// THIS WORKS WITH NON SWARM:
 const redisHost  = process.env.REDIS_PORT_6379_TCP_ADDR;
 const redisPort  = process.env.REDIS_PORT_6379_TCP_PORT;
 const dbClient: any = redis.createClient(redisPort, redisHost);
+
+// TRYING THIS WITH SWARM STYLE
+// const redisHostUrl  = process.env.REDIS_HOST;
+// const redisPort  = process.env.REDIS_PORT_6379_TCP_PORT || 6379;
+// const dbClient: any = redis.createClient();
+
 
 function setupChatServer(serverPort: number): number {
     // Set server to dish up the React App at root using static build folder

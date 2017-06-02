@@ -21,6 +21,26 @@ $ docker run -itd --name chatty -P -p 3001:3001 -p 8080:8080 --link redis:redis 
 
 You should now be able to browse to the chat application at localhost 3001. Port 8080 is used for socket.io communication; port 3001 is the route used by express to serve up the static built react client. Port 6379 is the default Redis port.
 
+### Making a swarm
+$ docker swarm init
+$ docker stack deploy -c docker-compose.yml chatty
+
+
+
+### Teardown
+```
+$ docker kill redis
+```
+#### If a single server:
+```
+$ docker kill chatty
+```
+
+#### If a swarm:
+```
+$ docker stack rm chatty
+```
+
 ## Manual Installation without Docker
 
 ### Install all dependencies:
