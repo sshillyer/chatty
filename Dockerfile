@@ -22,8 +22,7 @@ RUN npm install
 RUN npm run build
 
 # Expose app's' port to map it to docker daemon
-EXPOSE 3001
-EXPOSE 8080
+EXPOSE 3000
 
 # Launch chat-server
 WORKDIR /usr/src/app

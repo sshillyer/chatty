@@ -6,6 +6,7 @@ import * as path from 'path';
 import * as sio from 'socket.io';
 import * as http from 'http';
 import * as redis from 'redis';
+// import * as os from 'os';
 
 // Data model(s)
 import Message from './models/Message';
@@ -17,7 +18,8 @@ const server: http.Server = http.createServer(app);
 const socketIOPort: number = serverPort;
 const io: SocketIO.Server = sio(server);
 
-// THIS WORKS WITH NON SWARM:
+
+// Assumes using docker with config file provided. Confirmed working unless deploying multiple severs
 const redisHost  = 'redis'; // 'localhost'  if serving locally
 const redisPort  = 6379;
 const dbClient: any = redis.createClient(redisPort, redisHost);
@@ -36,7 +38,7 @@ function setupChatServer(serverPort: number): number {
         res.sendFile(path.join(__dirname, '../chat2/build', 'index.html'));
     });
 
-    server.listen(serverPort).on('error', () => {
+    server.listen(serverPort, "0.0.0.0").on('error', () => {
         return -1;
     });
 

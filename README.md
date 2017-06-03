@@ -26,7 +26,6 @@ docker run --name redis -d -p 6379:6379 --network=chattynet sshillyer/redis
 docker run -itd --name chatty -p 3000:3000 --network=chattynet sshillyer/chatty
 ```
 
-
 ### Making a swarm
 $ docker swarm init
 $ docker stack deploy -c docker-compose.yml chatty
