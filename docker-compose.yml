@@ -1,15 +1,18 @@
 version: "3"
 services:
   chatty:
-    image: sshillyer/chatty
+    image: sshillyer/chatty2
     deploy:
-      replicas: 3
+      replicas: 2
       resources:
         limits:
           cpus: "0.1"
           memory: 100M
       restart_policy:
         condition: on-failure
+      # Comment out this placement once single-server working
+      placement:
+        constraints: [node.role == manager]
     ports:
       - "3000:3000"
     networks:
@@ -20,17 +23,22 @@ services:
       - "6379:6379"
     networks:
       - chatnet
-  visualizer:
-    image: dockersamples/visualizer:stable
-    ports:
-      - "8080:8080"
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
+      - ./data:/data
     deploy:
       placement:
         constraints: [node.role == manager]
-    networks:
-      - chatnet
+  # visualizer:
+  #   image: dockersamples/visualizer:stable
+  #   ports:
+  #     - "8080:8080"
+  #   volumes:
+  #     - "/var/run/docker.sock:/var/run/docker.sock"
+  #   deploy:
+  #     placement:
+  #       constraints: [node.role == manager]
+  #   networks:
+  #     - chatnet
 networks:
   chatnet:
     driver: overlay

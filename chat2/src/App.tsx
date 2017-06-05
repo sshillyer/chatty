@@ -22,7 +22,7 @@ class App extends React.Component<AppProps, AppState> {
 
   constructor() {
     super();
-    // this.socket = io('http://' + 'chatty' + ':8080');
+    // this.socket = io('http://' + 'chatty' + ':3000');
     this.socket = io();
     this.state = {data: {}, username: '', isLoggedIn: false, messageHistory: ['Empty'] };
     this.setState = this.setState.bind(this);

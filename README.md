@@ -1,35 +1,42 @@
-# Chat server + React APP client
-Chat server developed using Typescript, Express, and Socket IO. It serves the app contained in /chat2 and handles the socket io requests as well. This app has been dockerized to deploy as a separate server and client (in one Docker container) that works with a linked Redis docker container.
+# About Chatty
+Chat server developed using Node.js TypeScript, Express, React, and Socket IO. It serves the app contained in /chat2 and handles the socket io requests as well. This app has been dockerized to deploy as a separate server and client (each in their own Docker container but deployed on a docker network).
 
-## Deploy using Docker
-* This requires a machine with Docker installed and has no other dependencies.
-* All commands are from root of the project.
-* This is the preferred error-proof method of setting up the project.
+* Runtime environment and platform
+* Typescript: enforces typing; layer on top of Node.js
+* Express: Simple routing module for Node
+* React: Web-app framework developed by Facebook. Presents user interface and maintains state during execution. Allows development of small components and composition of these components into an interface.
+* Socket.io: Networking between client and server is established using sockets. Signals are sent back and forth to signal events.
+* Socket.io-redis: Creates a bridge between all connected clients, rebroadcasting messages from isolated clients to any other connected clients.
+* Redis: In addition to being used by Socket.io to handle distribution of messages to connected clients (see above), all message history and connection events are logged to the Redis database.
+* Testing Framework: Mocha, Chai, Sinon and Istanbul were used to partially test the code. Project was not written in a TDD style so testing is partial and far from complete, but could be expanded on later.
 
-1. Build Docker images
+## Usage
+This application can most easily be deployed using Docker in a development environment.
+
+* Requirements: Device with Docker installed. This was built using Docker version 17.03.1-ce
+* All commands are from project root unless prefaced by a cd command
+
+1. Build Docker images for chat server and Redis. From project root:
 ```
 $ docker build -t sshillyer/chatty .
 $ cd chatty-db
 $ docker build -t sshillyer/redis .
-
 ```
-2. Set up a docker network
+
+2. Set up a docker network for the app to enable hostname lookups and open ports
 ```
 docker network create chattynet
 ```
 
-3. Run the images on that network
-### Setting up on a custom network
+3. Run the images on that network (Redis must launch first)
 ```
-docker network create chattynet
 docker run --name redis -d -p 6379:6379 --network=chattynet sshillyer/redis
-docker run -itd --name chatty -p 3000:3000 --network=chattynet sshillyer/chatty
+docker run -itd --name chatty1 -p 3001:3001 -e PORT="3001" --network=chattynet sshillyer/chatty
+docker run -itd --name chatty2 -p 3002:3002 -e PORT="3002" --network=chattynet sshillyer/chatty
+docker run -itd --name chatty3 -p 3003:3003 -e PORT="3003" --network=chattynet sshillyer/chatty
+docker run -itd --name chatty4 -p 3004:3004 -e PORT="3004" --network=chattynet sshillyer/chatty
+
 ```
-
-### Making a swarm
-$ docker swarm init
-$ docker stack deploy -c docker-compose.yml chatty
-
 
 ### Teardown
 ```
@@ -37,6 +44,37 @@ docker kill $(docker ps -a -q)
 docker rm $(docker ps -a -q)
 ```
 
+
+
+
+
+
+## Deprecated Instructions and Notes for Self
+### Making a swarm
+```
+$ docker swarm init
+$ docker stack deploy -c docker-compose.yml chatty
+```
+
+### Swarm across machines
+```
+docker-machine ssh vm1 "docker swarm init --advertise-addr 147.34.54.160:2377"
+
+docker-machine ssh vm2 "docker swarm join \
+--token SWMTKN-1-5tl3pmpga0xkylwyso8gcoa96kz0jee47aeov5wov8bw5frhiu-dbuxyxxq92za0jvunlkc8i9tl \
+147.34.54.160:2377"
+
+docker-machine ssh vm1 "mkdir ./data"
+
+docker-machine scp docker-compose.yml vm1:~
+
+docker-machine ssh vm1 "docker stack deploy -c docker-compose.yml chatty"
+```
+
+#### Check the stack is deployed
+```
+docker-machine ssh vm1 "docker stack ps chatty"
+```
 
 ## Manual Installation without Docker
 
@@ -86,7 +124,7 @@ $ src/redis-server  # from the redis folder (e.g. root/redis-3.2.9)
 Navigate to localhost:3000 (default) in a browser
 
 
-## TODO:
+## Testing:
 These tasks need to be completed. This is in rough priority order:
 
 * Implement additional tests using the following libraries:

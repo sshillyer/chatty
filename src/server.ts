@@ -7,6 +7,7 @@ import * as sio from 'socket.io';
 import * as http from 'http';
 import * as redis from 'redis';
 // import * as os from 'os';
+import * as sioRedis from 'socket.io-redis';
 
 // Data model(s)
 import Message from './models/Message';
@@ -24,10 +25,11 @@ const redisHost  = 'redis'; // 'localhost'  if serving locally
 const redisPort  = 6379;
 const dbClient: any = redis.createClient(redisPort, redisHost);
 
-// TRYING THIS WITH SWARM STYLE
-// const redisHostUrl  = process.env.REDIS_HOST;
-// const redisPort  = process.env.REDIS_PORT_6379_TCP_PORT || 6379;
-// const dbClient: any = redis.createClient();
+// Setup socket.io to use multi-server socket.io-redis
+io.adapter(sioRedis({ host: redisHost, port: 6379 }));
+// io.use((err: any) => console.log(err));
+
+
 
 
 function setupChatServer(serverPort: number): number {
@@ -38,8 +40,8 @@ function setupChatServer(serverPort: number): number {
         res.sendFile(path.join(__dirname, '../chat2/build', 'index.html'));
     });
 
-    server.listen(serverPort, "0.0.0.0").on('error', () => {
-        return -1;
+    server.listen(serverPort, "0.0.0.0").on('error', (err: Error) => {
+        console.log(err);
     });
 
     return serverPort;
@@ -55,6 +57,7 @@ function setupDatabase() {
 
 function setupSocketIO(socketIOPort: number) {
     // Socket.IO listens for events emitted by client-side JavaScript calls
+    
     io.on('connection', function (socket) {
         console.log('Socket IO connection established');
         
